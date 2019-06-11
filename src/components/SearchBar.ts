@@ -5,6 +5,7 @@ export class SearchBar extends LitElement {
     @property({ type: String, attribute: false }) inputId = "input-" + (Math.random()*1000%1).toString();
     @property({ type: String}) label = "";
     @property({ type: String}) placeholder = "";
+    @property({ type: String}) value = "";
 
     static get styles() {
         return css`
@@ -31,7 +32,11 @@ export class SearchBar extends LitElement {
         return html`
             <label for="${this.inputId}">${this.label}</label>
             <!-- searchChanged is wrapped in an arrow function to ensure correct context -->
-            <input id="${this.inputId}" @input="${(ev: Event) => this.searchChanged((<HTMLInputElement>ev.target).value)}" placeholder="${this.placeholder}"/>
+            <input 
+                id="${this.inputId}" 
+                @input="${(ev: Event) => this.searchChanged((<HTMLInputElement>ev.target).value)}" 
+                placeholder="${this.placeholder}"
+                .value="${this.value}"/>
         `;
     }
 

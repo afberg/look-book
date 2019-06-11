@@ -10,8 +10,8 @@ export function buildSearchUrl(base: string, searchValue: string): string {
 
 export async function parseSearchResponse(response: Response): Promise<Book[]> {
     return (await response.json()).docs.map( (book: any) => ({
-        isbn: book.isbn[0],
-        author: book.author_name[0] || "John Doe",
-        title: book.title[0] || "Untitled"
+        isbn: book.isbn ? book.isbn[0] : undefined,
+        author: book.author_name ? book.author_name[0] : "John Doe",
+        title: book.title || "Untitled"
     }));
 }
