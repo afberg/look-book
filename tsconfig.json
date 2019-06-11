@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "strict": false,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "sourceMap": true,
+        "strictNullChecks": false
+    },
+    "baseUrl": ".",
+}
