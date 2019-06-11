@@ -1,1 +1,1 @@
-import "./components/SearchBar";
+import "./components/BookSearch";
