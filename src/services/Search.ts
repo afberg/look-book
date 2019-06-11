@@ -5,5 +5,5 @@ export default function createSearchFunction(url: string): (query: string) => Pr
 }
 
 export function buildSearchUrl(base: string, searchValue: string): string {
-    return `${base}?q=${searchValue.toLowerCase().replace(/ /, "+")}`;
+    return `${base}?q=${searchValue.toLowerCase().replace(/ /g, "+")}`;
 }
