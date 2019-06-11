@@ -1,12 +1,14 @@
 import { LitElement, html, css, customElement, property } from 'lit-element';
 import "./SearchBar";
 import createSearch from "../services/Search";
-import { searchBase } from "../config";
+import { searchBase, debounceTime } from "../config";
+import { debounce } from "debounce";
 
 
 @customElement('book-search')
 export class BookSearch extends LitElement {
     @property({ type: Function, attribute: false }) search = createSearch(searchBase);
+    
     static get styles() {
         return css`
         `;
@@ -15,11 +17,11 @@ export class BookSearch extends LitElement {
 
     render() {
         return html`
-            <search-bar placeholder="Search for a book" label="Book Title" @update="${this.searchUpdated}"></search-bar>
+            <search-bar placeholder="Search for a book" label="Book Title" @update="${debounce(this.searchUpdated, debounceTime)}"></search-bar>
         `;
     }
 
-    async searchUpdated(event) {
+    async searchUpdated(event: any) {
         const response = await this.search(event.detail.value);
         console.log(await response.json());
     }
