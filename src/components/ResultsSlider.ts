@@ -8,6 +8,7 @@ export class ResultsSlider extends LitElement {
 
     @property({ type: Array}) results: Book[] = [];
     @property({ type: Number}) active = 0;
+    @property({ type: Number}) maxResults = 5;
     @property({ type: Function}) imageUrlGenerator = createImageUrlBuilder(imageBase);
 
     static get styles() {
@@ -21,11 +22,26 @@ export class ResultsSlider extends LitElement {
             justify-content: space-between;
             padding: 20px;
             box-sizing: border-box;
-            width: 400px;
+            min-width: 400px;
+            max-width: 400px;
             max-height: 600px;
+        }
+        @media(max-width: 400px) {
+            .result {
+                min-width: 300px;
+                max-width: 300px;
+            }
+        }
+
+        @media(max-width: 300px) {
+            .result {
+                min-width: 100px;
+                max-width: 100px;
+            }
         }
         img {
             object-fit: contain;
+            max-width: 100%;
         }
         .slider{
             width: 100%;
@@ -53,11 +69,14 @@ export class ResultsSlider extends LitElement {
     }
 
     render() {
+        const resultsToShow = this.results.slice(Math.max(this.active - this.maxResults, 0), this.active + this.maxResults);
+        console.log(resultsToShow);
+
         return html`
             <div class="results">
                 <!-- TODO: implement navigation buttons so this works for desktops etc -->
                 <div class="slider">
-                    ${this.results.map(result => html`
+                    ${resultsToShow.map(result => html`
                     <div class="result">
                             <img  srcset="
                                     ${this.imageUrlGenerator(result.isbn, "S")} 43w,

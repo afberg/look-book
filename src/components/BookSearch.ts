@@ -15,6 +15,7 @@ export class BookSearch extends LitElement {
     @property({ type: Array, attribute: false }) resultsList: Book[] = [];
     @property({ type: Boolean, attribute: false }) isRecording = false;
     @property({ type: Boolean, attribute: false }) isSearching = false;
+    @property({ type: Number, attribute: false }) maxResults = 5;
 
     static get styles() {
         return css`
@@ -48,7 +49,7 @@ export class BookSearch extends LitElement {
                 </search-bar>
                 <button @click="${this.startRecording}" ?disabled="${this.isRecording}">Record</button>
             </div>
-            <results-slider .results="${this.resultsList}"></results-slider>
+            <results-slider .results="${this.resultsList}" .maxResults="${this.maxResults}"></results-slider>
         `;
     }
 
