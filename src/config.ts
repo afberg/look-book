@@ -1,0 +1,1 @@
+export const searchBase = "http://openlibrary.org/search.json";

@@ -5,9 +5,6 @@ export class SearchBar extends LitElement {
     @property({ type: String, attribute: false }) inputId = "input-" + (Math.random()*1000%1).toString();
     @property({ type: String}) label = "";
     @property({ type: String}) placeholder = "";
-    constructor() {
-        super();
-    }
 
     static get styles() {
         return css`
@@ -39,7 +36,7 @@ export class SearchBar extends LitElement {
     }
 
     searchChanged(value: string){
-        this.dispatchEvent(new CustomEvent('search-updated', {
+        this.dispatchEvent(new CustomEvent('update', {
             detail: {
               value
             }
