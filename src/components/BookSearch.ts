@@ -1,6 +1,6 @@
 import { LitElement, html, css, customElement, property } from 'lit-element';
 import "./SearchBar";
-import createSearch from "../services/Search";
+import { createSearchFunction as createSearch, parseSearchResponse as parseResponse } from "../services/search";
 import { searchBase, debounceTime } from "../config";
 import { debounce } from "debounce";
 
@@ -8,7 +8,7 @@ import { debounce } from "debounce";
 @customElement('book-search')
 export class BookSearch extends LitElement {
     @property({ type: Function, attribute: false }) search = createSearch(searchBase);
-    
+
     static get styles() {
         return css`
         `;
@@ -23,6 +23,7 @@ export class BookSearch extends LitElement {
 
     async searchUpdated(event: any) {
         const response = await this.search(event.detail.value);
-        console.log(await response.json());
+        const parsed = await parseResponse(response);
+        console.log(parsed);
     }
 }
