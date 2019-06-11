@@ -1,20 +1,24 @@
 import { LitElement, html, css, customElement, property } from 'lit-element';
 import "./SearchBar";
-import { createSearchFunction as createSearch, parseSearchResponse as parseResponse } from "../services/search";
+import "./ResultsSlider";
+import { createSearchFunction as createSearch, parseSearchResponse as parseResponse } from "../services/api";
 import { searchBase, debounceTime } from "../config";
 import { debounce } from "debounce";
 import { createRecognizer } from '../services/speech';
+import Book from '../types/book.i';
 
 
 @customElement('book-search')
 export class BookSearch extends LitElement {
     @property({ type: Function, attribute: false }) search = createSearch(searchBase);
-    @property({ type: String }) inputValue = "";
-    @property({ type: Boolean }) isRecording = false;
+    @property({ type: String, attribute: false }) inputValue = "";
+    @property({ type: Array, attribute: false }) resultsList: Book[] = [];
+    @property({ type: Boolean, attribute: false }) isRecording = false;
+    @property({ type: Boolean, attribute: false }) isSearching = false;
 
     static get styles() {
         return css`
-        :host {
+        .search-container {
             display: flex;
             align-items: flex-end;
             width: 100%;
@@ -35,20 +39,22 @@ export class BookSearch extends LitElement {
 
     render() {
         return html`
-            <search-bar 
-                placeholder="Search for a book" 
-                label="Book Title" 
-                @update="${debounce((ev: any) => this.searchUpdated(ev.detail.value), debounceTime)}" 
-                .value="${this.inputValue}">
-            </search-bar>
-            <button @click="${this.startRecording}" ?disabled="${this.isRecording}">Record</button>
+            <div class="search-container">
+                <search-bar 
+                    placeholder="Search for a book" 
+                    label="Book Title" 
+                    @update="${debounce((ev: any) => this.searchUpdated(ev.detail.value), debounceTime)}" 
+                    .value="${this.inputValue}">
+                </search-bar>
+                <button @click="${this.startRecording}" ?disabled="${this.isRecording}">Record</button>
+            </div>
+            <results-slider .results="${this.resultsList}"></results-slider>
         `;
     }
 
     async searchUpdated(searchTerm: string) {
         const response = await this.search(searchTerm);
-        const parsed = await parseResponse(response);
-        console.log(parsed);
+        this.resultsList = await parseResponse(response);
     }
 
     startRecording(ev: Event) {

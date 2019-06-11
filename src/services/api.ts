@@ -8,6 +8,10 @@ export function buildSearchUrl(base: string, searchValue: string): string {
     return `${base}?q=${searchValue.toLowerCase().replace(/ /g, "+")}`;
 }
 
+export function createImageUrlBuilder(base: string): (isbn: string, size: string) => string {
+    return (isbn, size) => `${base}${isbn}-${size.toUpperCase()}.jpg`;
+}
+
 export async function parseSearchResponse(response: Response): Promise<Book[]> {
     return (await response.json()).docs.map( (book: any) => ({
         isbn: book.isbn ? book.isbn[0] : undefined,
