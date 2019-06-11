@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "ESNext",
-        "strict": false,
+        "strict": true,
         "module": "esnext",
         "moduleResolution": "node",
         "experimentalDecorators": true,
