@@ -1,0 +1,1 @@
+export const addN = (augend: number) => (addend: number) => augend + addend; 
