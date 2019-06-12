@@ -75,19 +75,12 @@ export class BookSearch extends LitElement {
             display: block;
             height: 100%;
             margin:auto;
-
         }
 
         button[disabled] {
             background-color: grey;
             border-color: grey;
             cursor: not-allowed;
-        }
-        results-slider{
-            display: none;
-        }
-        results-slider.showing{
-            display: block;
         }
         .last-retrieved {
             background-color: white;
@@ -144,10 +137,10 @@ export class BookSearch extends LitElement {
             <div class="last-retrieved ${shouldShowRelativeTime ? "active": ""}" >
                 ${
                     shouldShowRelativeTime ? 
-                    this.rtf.format(
-                        -getRelativeTimeValue(timeDiff),
-                        getRelativeTimeUnit(timeDiff)) :
-                        ""
+                        this.rtf.format(
+                            -getRelativeTimeValue(timeDiff),
+                            getRelativeTimeUnit(timeDiff)
+                        ) : ""
                 }
             </div>
         `;
