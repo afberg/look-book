@@ -140,6 +140,9 @@ export class BookSearch extends LitElement {
                 .active="${this.activeResult}"
                 class="${this.resultsList.length > 0 ? "showing": ""}">
             </results-slider>
+            <div class="message ${this.isSearching} loading">
+
+            </div>
             
             <carousel-indicator .activeIx="${this.activeResult % maxIndicatorItems}" .count="${Math.min(this.resultsList.length, maxIndicatorItems) }"></carousel-indicator>
 
@@ -156,9 +159,11 @@ export class BookSearch extends LitElement {
     }
 
     async searchUpdated(searchTerm: string) {
+        this.isSearching = true;
         const response = await this.search(searchTerm);
         this.resultsList = await parseResponse(response);
         this.activeResult = 0;
+        this.isSearching = false;
         this.lastRetrieved = new Date();
         window.clearInterval(this.sliderInterval);
         window.clearInterval(this.lastRetrievedInterval);

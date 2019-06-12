@@ -30,6 +30,7 @@ export class ResultsSlider extends LitElement {
             background-size: cover;
             background-position: center;
         }
+        
         img {
             object-fit: cover;
             width: 100%;
@@ -37,7 +38,9 @@ export class ResultsSlider extends LitElement {
         }
         .slider{
             display: flex;
-            overflow-x: scroll;
+            /* user scroll is disabled to not break auto scroll*/
+            /*overflow-x: scroll;*/
+            overflow-x: hidden;
             scroll-snap-type: x mandatory;
             width: 100%;
         }
@@ -71,7 +74,7 @@ export class ResultsSlider extends LitElement {
 
     render() {
         //Add first few elements to end of array, to create an infinite scroll appearance
-        const resultsToShow = this.results.length > 3? [...this.results, ...this.results.slice(0,3)] : this.results; 
+        const resultsToShow = this.results.length > 1? [...this.results, this.results[0], this.results[1]] : this.results;
         return html`
             <div class="results" >
                 <div class="slider">
@@ -85,7 +88,7 @@ export class ResultsSlider extends LitElement {
                                     ${this.imageUrlGenerator(result.isbn, "L")} 360w"
                                 sizes="
                                     (max-width: 100px) 50px,
-                                    (max-width: 400px) 300px,
+                                    (max-width: 400px) 200px,
                                     (max-width: 600px) 375px"
                                 
                             >`: html``}
