@@ -19,18 +19,32 @@ export class SearchBar extends LitElement {
             outline-style: none;
             color: inherit;
         }
+        .search-container {
+            display: flex;
+            align-items: flex-end;
+            border: 1px solid #ddd;
+            border-radius: 26px;
+            overflow:hidden;
+            box-sizing: border-box;
+        }
+        .search-container:focus-within{
+            box-shadow: 0px 0px 5px 0px var(--lightPurple);
+        }
         `;
         
     }
 
     render() {
         return html`
+         <div class="search-container">
             <!-- searchChanged is wrapped in an arrow function to ensure correct context -->
             <input 
                 id="${this.inputId}" 
                 @input="${(ev: Event) => this.searchChanged((<HTMLInputElement>ev.target).value)}" 
                 placeholder="${this.placeholder}"
                 .value="${this.value}"/>
+                <slot></slot>
+        </div>
         `;
     }
 

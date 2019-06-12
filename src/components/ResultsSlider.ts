@@ -24,23 +24,16 @@ export class ResultsSlider extends LitElement {
             justify-content: space-between;
             padding: 20px;
             box-sizing: border-box;
-            width: 100vw;
+            width: calc(100vw - 20px);
             flex-shrink: 0;
-            max-width: 400px;
-            max-height: 600px;
-            min-height: 500px;
+            max-width: 375px;
             background-size: cover;
             background-position: center;
-        }
-        @media (max-width: 400px) {
-            .result {
-                max-width: 300px;
-                max-height:450px;
-            }
         }
         img {
             object-fit: cover;
             width: 100%;
+            max-height: 500px;
         }
         .slider{
             display: flex;
@@ -93,7 +86,7 @@ export class ResultsSlider extends LitElement {
                                 sizes="
                                     (max-width: 100px) 50px,
                                     (max-width: 400px) 300px,
-                                    (max-width: 600px) 400px"
+                                    (max-width: 600px) 375px"
                                 
                             >`: html``}
                             <div class="info">

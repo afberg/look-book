@@ -5,4 +5,7 @@ module.exports = {
     "transform": {
       "^.+\\.ts$": "ts-jest"
     },
+    "moduleNameMapper": {
+      "\\.(jp|pn|sv)g$": "<rootDir>/__mocks__/fileMock.js",
+    }
   }

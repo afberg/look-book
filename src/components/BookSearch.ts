@@ -1,8 +1,16 @@
 import { LitElement, html, css, customElement, property } from 'lit-element';
 import "./SearchBar";
 import "./ResultsSlider";
+import "./CarouselIndicator";
 import { createSearchFunction as createSearch, parseSearchResponse as parseResponse } from "../services/api";
-import { searchBase, debounceTime, sliderInterval, timerInterval } from "../config";
+import { 
+    searchBase,
+    debounceTime, 
+    sliderInterval, 
+    timerInterval, 
+    maxIndicatorItems,
+    loadImagesAheadCount
+} from "../config";
 import { debounce } from "debounce";
 import { createRecognizer } from '../services/speech';
 import Book from '../types/book.i';
@@ -18,7 +26,7 @@ export class BookSearch extends LitElement {
     @property({ type: Array, attribute: false }) resultsList: Book[] = [];
     @property({ type: Boolean, attribute: false }) isRecording = false;
     @property({ type: Boolean, attribute: false }) isSearching = false;
-    @property({ type: Number, attribute: false }) loadAhead = 5;
+    @property({ type: Number, attribute: false }) loadAhead = loadImagesAheadCount;
     @property({ type: Number, attribute: false }) activeResult = 0;
     @property({ type: Number, attribute: false }) sliderInterval: number;
     @property({ type: Number, attribute: false }) lastRetrievedInterval: number;
@@ -41,22 +49,11 @@ export class BookSearch extends LitElement {
     }
     static get styles() {
         return css`
-        .search-container {
-            display: flex;
-            align-items: flex-end;
+        .search {
             width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 26px;
-            overflow:hidden;
+            padding: 10px 10px 0px;
+            background-color:white;
             box-sizing: border-box;
-            margin-top: 10px;
-            margin-bottom: 10px;
-        }
-        .search-container:focus-within{
-            box-shadow: 0px 0px 5px 0px var(--lightPurple);
-        }
-        search-bar {
-            flex-grow: 1;
         }
         button {
             border: 1px solid var(--darkPurple);
@@ -67,6 +64,10 @@ export class BookSearch extends LitElement {
             border-radius: 50%;
             background-color: var(--lightPurple);
             cursor: pointer;
+            flex-shrink: 0;
+        }
+        serach-bar {
+            flex-grow: 1;
         }
         button:hover, button:active{
             background-color: var(--darkPurple);
@@ -107,6 +108,11 @@ export class BookSearch extends LitElement {
             content: "Books fetched";
             display: block;
         }
+        carousel-indicator {
+            --indicatorColor: var(--lightPurple);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
         `;
         
     }
@@ -115,17 +121,18 @@ export class BookSearch extends LitElement {
         const timeDiff = this.currentTime.getTime() - this.lastRetrieved.getTime();
         const shouldShowRelativeTime = timeDiff > 0 && this.resultsList.length > 0;
         return html`
-            <div class="search-container">
+           <div class="search">
                 <search-bar 
                     placeholder="Search for a book" 
                     label="Book Title" 
                     @update="${debounce((ev: any) => this.searchUpdated(ev.detail.value), debounceTime)}" 
                     .value="${this.inputValue}">
+                    <button @click="${this.startRecording}" ?disabled="${this.isRecording}">
+                        <img src="${microphone}">
+                    </button>
                 </search-bar>
-                <button @click="${this.startRecording}" ?disabled="${this.isRecording}">
-                    <img src="${microphone}">
-                </button>
             </div>
+            
             
             <results-slider 
                 .results="${this.resultsList}" 
@@ -133,6 +140,8 @@ export class BookSearch extends LitElement {
                 .active="${this.activeResult}"
                 class="${this.resultsList.length > 0 ? "showing": ""}">
             </results-slider>
+            
+            <carousel-indicator .activeIx="${this.activeResult % maxIndicatorItems}" .count="${Math.min(this.resultsList.length, maxIndicatorItems) }"></carousel-indicator>
 
             <div class="last-retrieved ${shouldShowRelativeTime ? "active": ""}" >
                 ${
