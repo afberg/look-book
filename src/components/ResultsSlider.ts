@@ -53,11 +53,14 @@ export class ResultsSlider extends LitElement {
         
     }
     updated(changedProperties: any) {
-        if(changedProperties.get("active")) {
+        const activeProp = changedProperties.get("active")
+        // Zero evaluates to false, so an extra check is needed
+        if(activeProp || activeProp === 0) {
             if(this.active === 0){
                 this.shadowRoot.querySelector(".slider").scrollLeft = 0;
             }
-                this.scrollToElement(this.shadowRoot.querySelector(`.result:nth-child(${this.active + 1})`));
+            console.log("scrolling to ", this.active + 1);
+            this.scrollToElement(this.shadowRoot.querySelector(`.result:nth-child(${this.active + 1})`));
             
         }
     }

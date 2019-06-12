@@ -60,8 +60,7 @@ export class BookSearch extends LitElement {
         this.activeResult = 0;
         window.clearInterval(this.interval);
         this.interval = window.setInterval(() => {
-            this.activeResult = ((this.activeResult + 1) % (this.resultsList.length));
-            console.log(this.activeResult);
+            this.activeResult = ((this.activeResult + 1) % (this.resultsList.length + 1));
         }, 1000);
     }
 
