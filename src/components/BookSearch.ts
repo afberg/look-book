@@ -57,10 +57,11 @@ export class BookSearch extends LitElement {
     async searchUpdated(searchTerm: string) {
         const response = await this.search(searchTerm);
         this.resultsList = await parseResponse(response);
-        this.activeResult = 1;
+        this.activeResult = 0;
         window.clearInterval(this.interval);
         this.interval = window.setInterval(() => {
-            this.activeResult++;
+            this.activeResult = ((this.activeResult + 1) % (this.resultsList.length));
+            console.log(this.activeResult);
         }, 1000);
     }
 

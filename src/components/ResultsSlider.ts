@@ -26,6 +26,7 @@ export class ResultsSlider extends LitElement {
             min-width: 100vw;
             max-width: 100vw;
             max-height: 600px;
+            min-height: 500px;
             background-size: cover;
             background-position: center;
         }
@@ -53,7 +54,11 @@ export class ResultsSlider extends LitElement {
     }
     updated(changedProperties: any) {
         if(changedProperties.get("active")) {
-            this.scrollToElement(this.shadowRoot.querySelector(`.result:nth-child(${this.active})`), this.active !== 0);
+            if(this.active === 0){
+                this.shadowRoot.querySelector(".slider").scrollLeft = 0;
+            }
+                this.scrollToElement(this.shadowRoot.querySelector(`.result:nth-child(${this.active + 1})`));
+            
         }
     }
 
@@ -64,7 +69,7 @@ export class ResultsSlider extends LitElement {
             <div class="results" >
                 <div class="slider" style="animation-duration: ${this.results.length}s;">
                     ${resultsToShow.map((result, ix) => html`
-                        <div class="result" style="background-image: url(${noCover});">
+                        <div class="result" style="background-image: url(${noCover});" id="${ix === 0 ? "first-book": ""}">
                         <!-- Only load the image if it's within threshold -->
                             ${ix < this.active  + this.loadAhead ? html`<img  
                                 srcset="
@@ -89,8 +94,8 @@ export class ResultsSlider extends LitElement {
         `;
     }
 
-    scrollToElement(elem: HTMLElement, smooth: boolean) {
-        elem.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "end", inline: "start" });
+    scrollToElement(elem: HTMLElement) {
+        elem.scrollIntoView({ behavior:"smooth", block: "end", inline: "start" });
     }
 
 }
