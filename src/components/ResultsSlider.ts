@@ -17,7 +17,7 @@ export class ResultsSlider extends LitElement {
         return css`
         .result{
             position: relative;
-            display: block;
+            display: flex;
             scroll-snap-align: start;
             flex-direction: column;
             align-items: center;
@@ -29,8 +29,10 @@ export class ResultsSlider extends LitElement {
             max-width: 375px;
             background-size: cover;
             background-position: center;
+            max-height: calc(100vh - 150px);
+            overflow: hidden;
         }
-        
+
         img {
             object-fit: cover;
             width: 100%;
@@ -68,6 +70,7 @@ export class ResultsSlider extends LitElement {
 
             //This variable makes sure already loaded images are not rerendered after slider loop
             this.lastLoaded = Math.max(this.active + this.loadAhead, this.lastLoaded);
+            //The nth-child selector starts at 1, not 0
             this.scrollToElement(this.shadowRoot.querySelector(`.result:nth-child(${this.active + 1})`));
         }
     }
@@ -85,13 +88,8 @@ export class ResultsSlider extends LitElement {
                                 srcset="
                                     ${this.imageUrlGenerator(result.isbn, "S")} 43w,
                                     ${this.imageUrlGenerator(result.isbn, "M")} 180w,
-                                    ${this.imageUrlGenerator(result.isbn, "L")} 360w"
-                                sizes="
-                                    (max-width: 100px) 50px,
-                                    (max-width: 400px) 200px,
-                                    (max-width: 600px) 375px"
-                                
-                            >`: html``}
+                                    ${this.imageUrlGenerator(result.isbn, "L")} 600w"
+                                sizes="(min-width: 600px) 559px, (min-width: 400px) 200px, (min-width: 200px) 42px">`: ""}
                             <div class="info">
                                 <div class="title">${result.title}</div>
                                 <div class="author">${result.author}</div>

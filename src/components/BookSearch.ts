@@ -2,6 +2,7 @@ import { LitElement, html, css, customElement, property } from 'lit-element';
 import "./SearchBar";
 import "./ResultsSlider";
 import "./CarouselIndicator";
+import "./RelativeTime";
 import { createSearchFunction as createSearch, parseSearchResponse as parseResponse } from "../services/api";
 import { 
     searchBase,
@@ -14,8 +15,8 @@ import {
 import { debounce } from "debounce";
 import { createRecognizer } from '../services/speech';
 import Book from '../types/book.i';
-import { getRelativeTimeValue, getRelativeTimeUnit } from '../services/date';
 import microphone from "../assets/microphone.svg";
+import stroopwafel from "../assets/stroopwafel.svg";
 
 
 
@@ -32,8 +33,7 @@ export class BookSearch extends LitElement {
     @property({ type: Number, attribute: false }) lastRetrievedInterval: number;
     @property({ type: Date, attribute: false }) lastRetrieved: Date = new Date();
     @property({ type: Date, attribute: false }) currentTime: Date = new Date();
-    //@ts-ignore: Relativetimeformat is a new property that ts doesn't know about
-    @property({ type: Function, attribute: false }) rtf = new Intl.RelativeTimeFormat(navigator.language, { style: 'long' });
+
 
     constructor(){
         super();
@@ -51,9 +51,9 @@ export class BookSearch extends LitElement {
         return css`
         .search {
             width: 100%;
-            padding: 10px 10px 0px;
             background-color:white;
             box-sizing: border-box;
+            margin-bottom: 5px;
         }
         button {
             border: 1px solid var(--darkPurple);
@@ -68,6 +68,8 @@ export class BookSearch extends LitElement {
         }
         serach-bar {
             flex-grow: 1;
+            margin-bottom: 5px;
+            display: block;
         }
         button:hover, button:active{
             background-color: var(--darkPurple);
@@ -83,29 +85,18 @@ export class BookSearch extends LitElement {
             border-color: grey;
             cursor: not-allowed;
         }
-        .last-retrieved {
-            background-color: white;
-            box-shadow: 0px 0px 5px 0px var(--lightPurple);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: fixed;
-            bottom: 10px;
-            width: calc(100% - 20px);
-            max-width: 780px;
-            margin: 0 10px;
-            height: 50px;
-            border-radius: 25px;
-            justify-content: space-around;
-            margin: 0 auto;
-            transform: translateY(calc(100% + 15px));
-            transition: transform 0.2s ease-in-out;
+        .message {
+            display: none;
+            text-align: center;
+            margin: 10px auto;
         }
-        .last-retrieved.active{
-            transform: translateY(0);
+        .loading {
+            width: 80px;
+            height: 80px;
+            display: block;
+            animation: rotate 1s linear;
         }
-        .last-retrieved::before{
-            content: "Books fetched";
+        .recording {
             display: block;
         }
         carousel-indicator {
@@ -113,18 +104,34 @@ export class BookSearch extends LitElement {
             justify-content: center;
             flex-wrap: wrap;
         }
+        relative-time {
+            position:fixed;
+            bottom: 10px;
+            width: calc(100% - 20px);
+            max-width: 780px;
+            transform: translateY(calc(100% + 15px));
+            transition: transform 0.2s ease-in-out;
+            display: block;
+            height: 50px;
+            z-index: 2;
+        }
+        relative-time.active{
+            transform: translateY(0);
+        }
+        @keyframes rotate {
+            from {transform: rotate(0deg)}
+            to {transform: rotate(360deg)}
+        }
         `;
         
     }
 
     render() {
-        const timeDiff = this.currentTime.getTime() - this.lastRetrieved.getTime();
-        const shouldShowRelativeTime = timeDiff > 0 && this.resultsList.length > 0;
+        
         return html`
            <div class="search">
                 <search-bar 
-                    placeholder="Search for a book" 
-                    label="Book Title" 
+                    placeholder="Search for a book"
                     @update="${debounce((ev: any) => this.searchUpdated(ev.detail.value), debounceTime)}" 
                     .value="${this.inputValue}">
                     <button @click="${this.startRecording}" ?disabled="${this.isRecording}">
@@ -140,25 +147,20 @@ export class BookSearch extends LitElement {
                 .active="${this.activeResult}"
                 class="${this.resultsList.length > 0 ? "showing": ""}">
             </results-slider>
-            <div class="message ${this.isSearching} loading">
-
+            <div class="message ${this.isSearching ? "loading" : this.isRecording ? "recording" : ""} ">
+                ${this.isSearching ? html`
+                    <img src="${stroopwafel}">
+                `: "Recording..."}
             </div>
-            
+            <relative-time .earlierDate="${this.lastRetrieved}" .laterDate="${this.currentTime}" class="${this.resultsList.length > 0 ? "active": ""}"></relative-time>
             <carousel-indicator .activeIx="${this.activeResult % maxIndicatorItems}" .count="${Math.min(this.resultsList.length, maxIndicatorItems) }"></carousel-indicator>
 
-            <div class="last-retrieved ${shouldShowRelativeTime ? "active": ""}" >
-                ${
-                    shouldShowRelativeTime ? 
-                        this.rtf.format(
-                            -getRelativeTimeValue(timeDiff),
-                            getRelativeTimeUnit(timeDiff)
-                        ) : ""
-                }
-            </div>
+            
         `;
     }
 
     async searchUpdated(searchTerm: string) {
+        this.resultsList = [];
         this.isSearching = true;
         const response = await this.search(searchTerm);
         this.resultsList = await parseResponse(response);
@@ -175,6 +177,7 @@ export class BookSearch extends LitElement {
     }
 
     startRecording() {
+        this.resultsList = [];
         const recognizer = createRecognizer(
             () => {
                 this.inputValue = "";

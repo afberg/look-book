@@ -22,7 +22,7 @@ export default class CarouselIndicator extends LitElement {
             height: var(--indicatorSize, 7px);
             margin: 5px;
             border-radius: 50%;
-            background-color: var(--indicatorColor, white);;
+            background-color: var(--indicatorColor, white);
             transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
             opacity: 0.7;
             position: relative;
