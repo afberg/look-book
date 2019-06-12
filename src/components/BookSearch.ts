@@ -6,6 +6,8 @@ import { searchBase, debounceTime } from "../config";
 import { debounce } from "debounce";
 import { createRecognizer } from '../services/speech';
 import Book from '../types/book.i';
+import { getRelativeTimeValue, getRelativeTimeUnit } from '../services/date';
+
 
 
 @customElement('book-search')
@@ -17,10 +19,12 @@ export class BookSearch extends LitElement {
     @property({ type: Boolean, attribute: false }) isSearching = false;
     @property({ type: Number, attribute: false }) loadAhead = 5;
     @property({ type: Number, attribute: false }) activeResult = 0;
-    @property({ type: Function, attribute: false }) interval: number;
-    @property({ type: Date, attribute: false }) lastRetrieved: Date;
+    @property({ type: Number, attribute: false }) sliderInterval: number;
+    @property({ type: Number, attribute: false }) lastRetrievedInterval: number;
+    @property({ type: Date, attribute: false }) lastRetrieved: Date = new Date();
+    @property({ type: Date, attribute: false }) currentTime: Date = new Date();
     //@ts-ignore: Relativetimeformat is a new property that ts doesn't know about
-    @property({ type: Function, attribute: false }) rtf1 = new Intl.RelativeTimeFormat(navigator.language, { style: 'long' });
+    @property({ type: Function, attribute: false }) rtf = new Intl.RelativeTimeFormat(navigator.language, { style: 'long' });
 
     static get styles() {
         return css`
@@ -38,11 +42,18 @@ export class BookSearch extends LitElement {
             width: 52px;
             border-radius: 50%;
         }
+        results-slider{
+            display: none;
+        }
+        results-slider.showing{
+            display: block;
+        }
         `;
         
     }
 
     render() {
+        const timeDiff = this.currentTime.getTime() - this.lastRetrieved.getTime();
         return html`
             <div class="search-container">
                 <search-bar 
@@ -53,7 +64,23 @@ export class BookSearch extends LitElement {
                 </search-bar>
                 <button @click="${this.startRecording}" ?disabled="${this.isRecording}">Record</button>
             </div>
-            <results-slider .results="${this.resultsList}" .loadAhead="${this.loadAhead}" .active="${this.activeResult}"></results-slider>
+            ${
+                // We only render the last retrieved div when results have been retrieved
+                timeDiff > 0 ? html`
+                <div class="last-retrieved">
+                    ${
+                        this.rtf.format(
+                            -getRelativeTimeValue(timeDiff),
+                            getRelativeTimeUnit(timeDiff))
+                    }
+                </div>` : html``
+            }
+            
+            <results-slider 
+                .results="${this.resultsList}" 
+                .loadAhead="${this.loadAhead}" 
+                .active="${this.activeResult}"
+                class="${this.resultsList.length > 0 ? "showing": ""}"></results-slider>
         `;
     }
 
@@ -62,11 +89,16 @@ export class BookSearch extends LitElement {
         this.resultsList = await parseResponse(response);
         this.activeResult = 0;
         this.lastRetrieved = new Date();
-        window.clearInterval(this.interval);
-        this.interval = window.setInterval(() => {
+        window.clearInterval(this.sliderInterval);
+        window.clearInterval(this.lastRetrievedInterval);
+        this.sliderInterval = window.setInterval(() => {
             this.activeResult = ((this.activeResult + 1) % (this.resultsList.length + 1));
-            
-        }, 1000);
+        }, 2000);
+
+        // Regularly updating a class property triggers a re-rendering of the specific element
+        this.lastRetrievedInterval = window.setInterval(() => {
+            this.currentTime = new Date();
+        }, 5000);
     }
 
     startRecording(ev: Event) {

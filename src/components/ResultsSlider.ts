@@ -10,21 +10,23 @@ export class ResultsSlider extends LitElement {
     @property({ type: Array}) results: Book[] = [];
     @property({ type: Number}) active = 0;
     @property({ type: Number}) loadAhead = 5;
+    @property({ type: Number}) lastLoaded = this.active;
     @property({ type: Function}) imageUrlGenerator = createImageUrlBuilder(imageBase);
 
     static get styles() {
         return css`
         .result{
             position: relative;
-            display: flex;
+            display: block;
             scroll-snap-align: start;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
             padding: 20px;
             box-sizing: border-box;
-            min-width: 100vw;
-            max-width: 100vw;
+            width: 100vw;
+            flex-shrink: 0;
+            max-width: 400px;
             max-height: 600px;
             min-height: 500px;
             background-size: cover;
@@ -32,9 +34,10 @@ export class ResultsSlider extends LitElement {
         }
         img {
             object-fit: cover;
+            width: 100%;
         }
         .slider{
-            display: inline-flex;
+            display: flex;
             overflow-x: scroll;
             scroll-snap-type: x mandatory;
             width: 100%;
@@ -56,40 +59,40 @@ export class ResultsSlider extends LitElement {
         const activeProp = changedProperties.get("active")
         // Zero evaluates to false, so an extra check is needed
         if(activeProp || activeProp === 0) {
-            if(this.active === 0){
+
+            //Resets the slider to the original position
+            if(this.active === 0)
                 this.shadowRoot.querySelector(".slider").scrollLeft = 0;
-            }
-            console.log("scrolling to ", this.active + 1);
+
+            this.lastLoaded = Math.max(this.active + this.loadAhead, this.lastLoaded);
             this.scrollToElement(this.shadowRoot.querySelector(`.result:nth-child(${this.active + 1})`));
-            
         }
     }
 
     render() {
-        //Add first element to end of array
-        const resultsToShow = this.results.length > 0 ? [...this.results, this.results[0]] : this.results; 
+        //Add first few elements to end of array, to create an infinite scroll appearance
+        const resultsToShow = this.results.length > 3? [...this.results, ...this.results.slice(0,3)] : this.results; 
         return html`
             <div class="results" >
-                <div class="slider" style="animation-duration: ${this.results.length}s;">
+                <div class="slider">
                     ${resultsToShow.map((result, ix) => html`
-                        <div class="result" style="background-image: url(${noCover});" id="${ix === 0 ? "first-book": ""}">
-                        <!-- Only load the image if it's within threshold -->
-                            ${ix < this.active  + this.loadAhead ? html`<img  
+                        <div class="result" style="background-image: url(${noCover});">
+                            <!-- Only load the image if it's within threshold -->
+                            ${ix < this.active  + this.loadAhead  || ix <= this.lastLoaded ? html`<img  
                                 srcset="
                                     ${this.imageUrlGenerator(result.isbn, "S")} 43w,
                                     ${this.imageUrlGenerator(result.isbn, "M")} 180w,
                                     ${this.imageUrlGenerator(result.isbn, "L")} 360w"
                                 sizes="
-                                    (max-width: 200px) 100px,
+                                    (max-width: 100px) 50px,
                                     (max-width: 400px) 300px,
-                                    (max-width: 600px) 360px"
+                                    (max-width: 600px) 400px"
                                 
                             >`: html``}
                             <div class="info">
                                 <div class="title">${result.title}</div>
                                 <div class="author">${result.author}</div>
                             </div>
-                            
                         </div>
                     `)}
                 </div>
