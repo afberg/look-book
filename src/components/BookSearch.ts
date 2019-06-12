@@ -26,6 +26,18 @@ export class BookSearch extends LitElement {
     //@ts-ignore: Relativetimeformat is a new property that ts doesn't know about
     @property({ type: Function, attribute: false }) rtf = new Intl.RelativeTimeFormat(navigator.language, { style: 'long' });
 
+    constructor(){
+        super();
+        //Add event listeners to stop slider when page is in the background
+        window.onblur = () => window.clearInterval(this.sliderInterval);
+        window.onfocus = () => {
+            if(this.resultsList.length > 0) {
+                window.clearInterval(this.sliderInterval)
+                this.sliderInterval = this.createSliderInterval();
+            }
+                
+        }
+    }
     static get styles() {
         return css`
         .search-container {
@@ -91,10 +103,7 @@ export class BookSearch extends LitElement {
         this.lastRetrieved = new Date();
         window.clearInterval(this.sliderInterval);
         window.clearInterval(this.lastRetrievedInterval);
-        this.sliderInterval = window.setInterval(() => {
-            this.activeResult = ((this.activeResult + 1) % (this.resultsList.length + 1));
-        }, 2000);
-
+        this.sliderInterval = this.createSliderInterval();
         // Regularly updating a class property triggers a re-rendering of the specific element
         this.lastRetrievedInterval = window.setInterval(() => {
             this.currentTime = new Date();
@@ -115,5 +124,11 @@ export class BookSearch extends LitElement {
             }
         );
         recognizer.start();
+    }
+
+    createSliderInterval(){
+        return window.setInterval(() => {
+            this.activeResult = ((this.activeResult + 1) % (this.resultsList.length + 1));
+        }, 2000);
     }
 }
