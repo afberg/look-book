@@ -9,20 +9,14 @@ export class SearchBar extends LitElement {
 
     static get styles() {
         return css`
-        label, input {
-            display: block;
-        }
-        label {
-            font-size: 21px;
-
-        }
         input {
+            displauy: block;
             padding: 10px;
             font-size: 24px;
             width: 100%;
-            border-bottom: 2px solid #ddd;
-            border-radius: 10px;
+            border: none;
             box-sizing: border-box;
+            outline-style: none;
         }
         `;
         
@@ -30,7 +24,6 @@ export class SearchBar extends LitElement {
 
     render() {
         return html`
-            <label for="${this.inputId}">${this.label}</label>
             <!-- searchChanged is wrapped in an arrow function to ensure correct context -->
             <input 
                 id="${this.inputId}" 

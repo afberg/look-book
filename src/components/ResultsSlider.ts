@@ -64,6 +64,7 @@ export class ResultsSlider extends LitElement {
             if(this.active === 0)
                 this.shadowRoot.querySelector(".slider").scrollLeft = 0;
 
+            //This variable makes sure already loaded images are not rerendered after slider loop
             this.lastLoaded = Math.max(this.active + this.loadAhead, this.lastLoaded);
             this.scrollToElement(this.shadowRoot.querySelector(`.result:nth-child(${this.active + 1})`));
         }

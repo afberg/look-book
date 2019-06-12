@@ -7,6 +7,7 @@ import { debounce } from "debounce";
 import { createRecognizer } from '../services/speech';
 import Book from '../types/book.i';
 import { getRelativeTimeValue, getRelativeTimeUnit } from '../services/date';
+import microphone from "../assets/microphone.svg";
 
 
 
@@ -44,15 +45,42 @@ export class BookSearch extends LitElement {
             display: flex;
             align-items: flex-end;
             width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 26px;
+            overflow:hidden;
+            box-sizing: border-box;
+            margin-top: 10px;
+        }
+        .search-container:focus-within{
+            box-shadow: 0px 0px 5px 0px #ffcfff;
         }
         search-bar {
             flex-grow: 1;
         }
         button {
-            margin-left: 10px;
-            height: 52px;
-            width: 52px;
+            border: 1px solid #632b8e;
+            padding: 10px;
+            box-sizing: border-box;
+            height: 48px;
+            width: 48px;
             border-radius: 50%;
+            background-color: #9658c5;
+            cursor: pointer;
+        }
+        button:hover{
+            background-color: #632b8e;
+        }
+        button img {
+            display: block;
+            height: 100%;
+            margin:auto;
+
+        }
+
+        button[disabled] {
+            background-color: grey;
+            border-color: grey;
+            cursor: not-allowed;
         }
         results-slider{
             display: none;
@@ -66,6 +94,7 @@ export class BookSearch extends LitElement {
 
     render() {
         const timeDiff = this.currentTime.getTime() - this.lastRetrieved.getTime();
+        const shouldShowRelativeTime = timeDiff > 0 && this.resultsList.length > 0;
         return html`
             <div class="search-container">
                 <search-bar 
@@ -74,11 +103,13 @@ export class BookSearch extends LitElement {
                     @update="${debounce((ev: any) => this.searchUpdated(ev.detail.value), debounceTime)}" 
                     .value="${this.inputValue}">
                 </search-bar>
-                <button @click="${this.startRecording}" ?disabled="${this.isRecording}">Record</button>
+                <button @click="${this.startRecording}" ?disabled="${this.isRecording}">
+                    <img src="${microphone}">
+                </button>
             </div>
             ${
                 // We only render the last retrieved div when results have been retrieved
-                timeDiff > 0 ? html`
+                shouldShowRelativeTime? html`
                 <div class="last-retrieved">
                     ${
                         this.rtf.format(
@@ -110,7 +141,7 @@ export class BookSearch extends LitElement {
         }, 5000);
     }
 
-    startRecording(ev: Event) {
+    startRecording() {
         const recognizer = createRecognizer(
             () => {
                 this.inputValue = "";
