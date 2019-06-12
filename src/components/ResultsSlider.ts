@@ -2,55 +2,45 @@ import { LitElement, html, css, customElement, property} from 'lit-element';
 import Book from '../types/book.i';
 import { imageBase } from "../config";
 import { createImageUrlBuilder } from '../services/api';
+import noCover from "../assets/noCover.jpg";
 
 @customElement('results-slider')
 export class ResultsSlider extends LitElement {
 
     @property({ type: Array}) results: Book[] = [];
     @property({ type: Number}) active = 0;
-    @property({ type: Number}) maxResults = 5;
+    @property({ type: Number}) loadAhead = 5;
     @property({ type: Function}) imageUrlGenerator = createImageUrlBuilder(imageBase);
 
     static get styles() {
         return css`
         .result{
             position: relative;
-            scroll-snap-align: start;
             display: flex;
+            scroll-snap-align: start;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
             padding: 20px;
             box-sizing: border-box;
-            min-width: 400px;
-            max-width: 400px;
+            min-width: 100vw;
+            max-width: 100vw;
             max-height: 600px;
-        }
-        @media(max-width: 400px) {
-            .result {
-                min-width: 300px;
-                max-width: 300px;
-            }
-        }
-
-        @media(max-width: 300px) {
-            .result {
-                min-width: 100px;
-                max-width: 100px;
-            }
+            background-size: cover;
+            background-position: center;
         }
         img {
-            object-fit: contain;
-            max-width: 100%;
+            object-fit: cover;
         }
         .slider{
-            width: 100%;
-            scroll-snap-type: x mandatory;
+            display: inline-flex;
             overflow-x: scroll;
-            display: flex;
+            scroll-snap-type: x mandatory;
+            width: 100%;
         }
         .results{
             position: relative;
+            width: 100%;
         }
         .info{
             display: flex;
@@ -62,43 +52,45 @@ export class ResultsSlider extends LitElement {
         
     }
     updated(changedProperties: any) {
-        //Force indicator back to zero when new results load
-        if(changedProperties.results) {
-            this.active = 0;
+        if(changedProperties.get("active")) {
+            this.scrollToElement(this.shadowRoot.querySelector(`.result:nth-child(${this.active})`), this.active !== 0);
         }
     }
 
     render() {
-        const resultsToShow = this.results.slice(Math.max(this.active - this.maxResults, 0), this.active + this.maxResults);
-        console.log(resultsToShow);
-
+        //Add first element to end of array
+        const resultsToShow = this.results.length > 0 ? [...this.results, this.results[0]] : this.results; 
         return html`
-            <div class="results">
-                <!-- TODO: implement navigation buttons so this works for desktops etc -->
-                <div class="slider">
-                    ${resultsToShow.map(result => html`
-                    <div class="result">
-                            <img  srcset="
+            <div class="results" >
+                <div class="slider" style="animation-duration: ${this.results.length}s;">
+                    ${resultsToShow.map((result, ix) => html`
+                        <div class="result" style="background-image: url(${noCover});">
+                        <!-- Only load the image if it's within threshold -->
+                            ${ix < this.active  + this.loadAhead ? html`<img  
+                                srcset="
                                     ${this.imageUrlGenerator(result.isbn, "S")} 43w,
                                     ${this.imageUrlGenerator(result.isbn, "M")} 180w,
-                                    ${this.imageUrlGenerator(result.isbn, "L")} 360w,
-                                    "
+                                    ${this.imageUrlGenerator(result.isbn, "L")} 360w"
                                 sizes="
-                                (max-width: 200px) 100px,
-                                (max-width: 400px) 300px,
-                                (max-width: 600px) 360px
-                                "
-                            >
+                                    (max-width: 200px) 100px,
+                                    (max-width: 400px) 300px,
+                                    (max-width: 600px) 360px"
+                                
+                            >`: html``}
                             <div class="info">
                                 <div class="title">${result.title}</div>
                                 <div class="author">${result.author}</div>
                             </div>
                             
-                    </div>
-                `)}
+                        </div>
+                    `)}
+                </div>
             </div>
-        </div>
         `;
+    }
+
+    scrollToElement(elem: HTMLElement, smooth: boolean) {
+        elem.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "end", inline: "start" });
     }
 
 }

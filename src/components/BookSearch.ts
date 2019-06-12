@@ -15,7 +15,9 @@ export class BookSearch extends LitElement {
     @property({ type: Array, attribute: false }) resultsList: Book[] = [];
     @property({ type: Boolean, attribute: false }) isRecording = false;
     @property({ type: Boolean, attribute: false }) isSearching = false;
-    @property({ type: Number, attribute: false }) maxResults = 5;
+    @property({ type: Number, attribute: false }) loadAhead = 5;
+    @property({ type: Number, attribute: false }) activeResult = 0;
+    @property({ type: Function, attribute: false }) interval: number;
 
     static get styles() {
         return css`
@@ -32,7 +34,6 @@ export class BookSearch extends LitElement {
             height: 52px;
             width: 52px;
             border-radius: 50%;
-
         }
         `;
         
@@ -49,13 +50,18 @@ export class BookSearch extends LitElement {
                 </search-bar>
                 <button @click="${this.startRecording}" ?disabled="${this.isRecording}">Record</button>
             </div>
-            <results-slider .results="${this.resultsList}" .maxResults="${this.maxResults}"></results-slider>
+            <results-slider .results="${this.resultsList}" .loadAhead="${this.loadAhead}" .active="${this.activeResult}"></results-slider>
         `;
     }
 
     async searchUpdated(searchTerm: string) {
         const response = await this.search(searchTerm);
         this.resultsList = await parseResponse(response);
+        this.activeResult = 1;
+        window.clearInterval(this.interval);
+        this.interval = window.setInterval(() => {
+            this.activeResult++;
+        }, 1000);
     }
 
     startRecording(ev: Event) {

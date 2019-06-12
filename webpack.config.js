@@ -39,14 +39,11 @@ module.exports = env => {
                         options: {
                             importLoaders: 1
                         }
-                    },
-                    {
-                        loader: 'postcss-loader'
                     }
                 ]
             },
             {
-                test: /\.svg$/,
+                test: /\.(sv|jp|pn)g$/,
                 use: "file-loader"
             },
             {
