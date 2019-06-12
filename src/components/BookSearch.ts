@@ -2,7 +2,7 @@ import { LitElement, html, css, customElement, property } from 'lit-element';
 import "./SearchBar";
 import "./ResultsSlider";
 import { createSearchFunction as createSearch, parseSearchResponse as parseResponse } from "../services/api";
-import { searchBase, debounceTime } from "../config";
+import { searchBase, debounceTime, sliderInterval, timerInterval } from "../config";
 import { debounce } from "debounce";
 import { createRecognizer } from '../services/speech';
 import Book from '../types/book.i';
@@ -50,25 +50,26 @@ export class BookSearch extends LitElement {
             overflow:hidden;
             box-sizing: border-box;
             margin-top: 10px;
+            margin-bottom: 10px;
         }
         .search-container:focus-within{
-            box-shadow: 0px 0px 5px 0px #ffcfff;
+            box-shadow: 0px 0px 5px 0px var(--lightPurple);
         }
         search-bar {
             flex-grow: 1;
         }
         button {
-            border: 1px solid #632b8e;
+            border: 1px solid var(--darkPurple);
             padding: 10px;
             box-sizing: border-box;
             height: 48px;
             width: 48px;
             border-radius: 50%;
-            background-color: #9658c5;
+            background-color: var(--lightPurple);
             cursor: pointer;
         }
-        button:hover{
-            background-color: #632b8e;
+        button:hover, button:active{
+            background-color: var(--darkPurple);
         }
         button img {
             display: block;
@@ -86,6 +87,31 @@ export class BookSearch extends LitElement {
             display: none;
         }
         results-slider.showing{
+            display: block;
+        }
+        .last-retrieved {
+            background-color: white;
+            box-shadow: 0px 0px 5px 0px var(--lightPurple);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: fixed;
+            bottom: 10px;
+            width: calc(100% - 20px);
+            max-width: 780px;
+            margin: 0 10px;
+            height: 50px;
+            border-radius: 25px;
+            justify-content: space-around;
+            margin: 0 auto;
+            transform: translateY(calc(100% + 15px));
+            transition: transform 0.2s ease-in-out;
+        }
+        .last-retrieved.active{
+            transform: translateY(0);
+        }
+        .last-retrieved::before{
+            content: "Books fetched";
             display: block;
         }
         `;
@@ -107,23 +133,23 @@ export class BookSearch extends LitElement {
                     <img src="${microphone}">
                 </button>
             </div>
-            ${
-                // We only render the last retrieved div when results have been retrieved
-                shouldShowRelativeTime? html`
-                <div class="last-retrieved">
-                    ${
-                        this.rtf.format(
-                            -getRelativeTimeValue(timeDiff),
-                            getRelativeTimeUnit(timeDiff))
-                    }
-                </div>` : html``
-            }
             
             <results-slider 
                 .results="${this.resultsList}" 
                 .loadAhead="${this.loadAhead}" 
                 .active="${this.activeResult}"
-                class="${this.resultsList.length > 0 ? "showing": ""}"></results-slider>
+                class="${this.resultsList.length > 0 ? "showing": ""}">
+            </results-slider>
+
+            <div class="last-retrieved ${shouldShowRelativeTime ? "active": ""}" >
+                ${
+                    shouldShowRelativeTime ? 
+                    this.rtf.format(
+                        -getRelativeTimeValue(timeDiff),
+                        getRelativeTimeUnit(timeDiff)) :
+                        ""
+                }
+            </div>
         `;
     }
 
@@ -135,10 +161,10 @@ export class BookSearch extends LitElement {
         window.clearInterval(this.sliderInterval);
         window.clearInterval(this.lastRetrievedInterval);
         this.sliderInterval = this.createSliderInterval();
-        // Regularly updating a class property triggers a re-rendering of the specific element
+        // Regularly updating a class property triggers a re-rendering of the specific element 
         this.lastRetrievedInterval = window.setInterval(() => {
             this.currentTime = new Date();
-        }, 5000);
+        }, timerInterval);
     }
 
     startRecording() {
@@ -160,6 +186,6 @@ export class BookSearch extends LitElement {
     createSliderInterval(){
         return window.setInterval(() => {
             this.activeResult = ((this.activeResult + 1) % (this.resultsList.length + 1));
-        }, 2000);
+        }, sliderInterval);
     }
 }

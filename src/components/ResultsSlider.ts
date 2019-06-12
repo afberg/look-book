@@ -32,6 +32,12 @@ export class ResultsSlider extends LitElement {
             background-size: cover;
             background-position: center;
         }
+        @media (max-width: 400px) {
+            .result {
+                max-width: 300px;
+                max-height:450px;
+            }
+        }
         img {
             object-fit: cover;
             width: 100%;

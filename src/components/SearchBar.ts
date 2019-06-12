@@ -10,13 +10,14 @@ export class SearchBar extends LitElement {
     static get styles() {
         return css`
         input {
-            displauy: block;
+            display: block;
             padding: 10px;
             font-size: 24px;
             width: 100%;
             border: none;
             box-sizing: border-box;
             outline-style: none;
+            color: inherit;
         }
         `;
         

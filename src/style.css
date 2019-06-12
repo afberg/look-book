@@ -2,4 +2,12 @@ main {
     max-width: 800px;
     margin: 0 auto;
     padding: 10px;
+    --lightPurple: #9658c5;
+    --darkPurple: #632b8e;
+
+}
+*, *::before, *::after {
+    /* Inherited through shadow DOMs */
+    font-family: Helvetica, Arial, sans-serif;
+    color: #484848;
 }
