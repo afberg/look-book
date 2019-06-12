@@ -18,6 +18,9 @@ export class BookSearch extends LitElement {
     @property({ type: Number, attribute: false }) loadAhead = 5;
     @property({ type: Number, attribute: false }) activeResult = 0;
     @property({ type: Function, attribute: false }) interval: number;
+    @property({ type: Date, attribute: false }) lastRetrieved: Date;
+    //@ts-ignore: Relativetimeformat is a new property that ts doesn't know about
+    @property({ type: Function, attribute: false }) rtf1 = new Intl.RelativeTimeFormat(navigator.language, { style: 'long' });
 
     static get styles() {
         return css`
@@ -58,9 +61,11 @@ export class BookSearch extends LitElement {
         const response = await this.search(searchTerm);
         this.resultsList = await parseResponse(response);
         this.activeResult = 0;
+        this.lastRetrieved = new Date();
         window.clearInterval(this.interval);
         this.interval = window.setInterval(() => {
             this.activeResult = ((this.activeResult + 1) % (this.resultsList.length + 1));
+            
         }, 1000);
     }
 
