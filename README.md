@@ -58,4 +58,4 @@ Simply clone the repository into a folder of your choice, run `npm i` and you ar
 
 To serve and build the project using webpack, simply run `npm start`. Some configurable parameters can be found in `config.ts`, feel free to play around with them.
 
-To run the implemented tests, use the command `npm t [-- --watch]`.
+To run the implemented tests, use the command `npm t`, if you want to watch for changes simply pass the `--watch` flag to jest like so: `npm t -- --watch`.
