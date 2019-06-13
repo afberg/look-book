@@ -25,7 +25,11 @@ As this was developed under time pressure there are plenty of improvements to be
 
 6. Any Types
 
-    Currently I'm using `any` types for many events and in some other places. This should preferably be changed to proper types, I just have not had the time yet to do so. 
+    Currently I'm using `any` types for many events and in some other places. This should preferably be changed to proper types, I just have not had the time yet to do so.
+
+7. Build scripts
+    
+    Obviously, if there is intention to launch this to the public some extra build scripts need to be created. Ideally, we would prerender the search-component into an index.html-file (using `skate.js` or similar), put the global css in an internal stylesheet and load the the minified and tree-shaken js-bundle asynchronously.
 
 
 ## Implementation
