@@ -33,7 +33,7 @@ As this was developed under time pressure there are plenty of improvements to be
 
 
 ## Implementation
-This was implemented using Typescript, Jest & custom elements (using a base class called lit-element). There is a simple addition function located in `add.ts` with corresponding tests.
+This was implemented using Typescript, Jest & custom elements (using a base class called [lit-element](https://github.com/Polymer/lit-element)). There is a simple addition function located in `add.ts` with corresponding tests.
 
 The use of lit-element is justified (in my opinion) by the improved developer experience (less boilerplate, yaay) and how lightning fast the underlying templating engine `lit-html` is. It is around 7kb gzipped and acts as an ultra-thin layer on top of custom elements. If you are familiar with native custom elements on the web, the syntax for lit-element should not be too different. If you feel that its use is not justified, feel free to ask me about it and I can hopefully defend my case further.
 
