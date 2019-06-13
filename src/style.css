@@ -4,7 +4,9 @@ main {
     padding: 10px;
     --lightPurple: #9658c5;
     --darkPurple: #632b8e;
-
+    overflow: hidden;
+    position: relative;
+    max-height: 100vh;
 }
 *, *::before, *::after {
     /* Inherited through shadow DOMs */

@@ -21,13 +21,17 @@ As this was developed under time pressure there are plenty of improvements to be
 
 5. Things in the right places
 
-    Right now the `BookSearch.ts` serves as a "master component", but it is way too large for my liking and some logic (like the one for the recording button) should be into a separate component.
+    Right now the `BookSearch.ts` serves as a "master component", but it is way too large for my liking and some logic (like the one for the recording button) should be into a separate component. The `ResultsSlider` should really be slimmed down as well, preferrably creating a `Book` component.
+
+6. Any Types
+
+    Currently I'm using `any` types for many events and in some other places. This should preferably be changed to proper types, I just have not had the time yet to do so. 
 
 
 ## Implementation
 This was implemented using Typescript, Jest & custom elements (using a base class called lit-element). There is a simple addition function located in `add.ts` with corresponding tests.
 
-The use of lit-element is justified (in my opinion) by the improved developer experience (less boilerplate, yaay) and how lightning fast the underlying templating engine `lit-html` is. If you are familiar with native custom elements on the web, the syntax for lit-element should not be too different. If you feel differently, feel free to ask me about it and I can hopefully defend my case further.
+The use of lit-element is justified (in my opinion) by the improved developer experience (less boilerplate, yaay) and how lightning fast the underlying templating engine `lit-html` is. It is around 7kb gzipped and acts as an ultra-thin layer on top of custom elements. If you are familiar with native custom elements on the web, the syntax for lit-element should not be too different. If you feel that its use is not justified, feel free to ask me about it and I can hopefully defend my case further.
 
 The application currently only works completely in Chrome, it is also the only browser where it has been tested.
 
